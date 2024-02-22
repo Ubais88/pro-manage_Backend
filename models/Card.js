@@ -34,11 +34,11 @@ const cardSchema = new mongoose.Schema(
       enum: ["Backlog", "ToDo", "Inprogress", "Done"],
       default: "ToDo",
     },
-    // creatorId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: "user",
-    // },
+    creatorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "user",
+    },
   },
   { timestamps: true }
 );
