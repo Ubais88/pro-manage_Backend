@@ -175,3 +175,59 @@ exports.getCard = async (req, res) => {
     });
   }
 };
+
+exports.getCardCounts = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "UserId is required",
+      });
+    }
+
+    const currentDate = moment().startOf("day");
+
+    const counts = {
+      backlog: 0,
+      inprogress: 0,
+      todo: 0,
+      done: 0,
+      lowpriority: 0,
+      moderatepriority: 0,
+      highpriority: 0,
+      dueDatePassed: 0,
+    };
+
+    const cards = await Card.find({ creatorId: userId }).select(
+      "priority sectionType dueDate"
+    );
+
+    cards.forEach((card) => {
+      const sectionType = card.sectionType.toLowerCase();
+      counts[sectionType]++;
+      const priority = card.priority.toLowerCase().replace(" ", "");
+      counts[priority]++;
+
+      if (sectionType !== "done" && card.dueDate) {
+        const dueDate = moment(card.dueDate);
+        if (dueDate.isBefore(currentDate, "day")) {
+          counts.dueDatePassed++;
+        }
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      counts,
+      message: "Card counts fetched successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Something went wrong while fetching card counts",
+    });
+  }
+};
+
