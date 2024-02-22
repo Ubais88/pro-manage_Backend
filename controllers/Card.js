@@ -46,3 +46,34 @@ exports.createCard = async (req, res) => {
     });
   }
 };
+
+exports.deleteCard = async (req, res) => {
+  try {
+    // Extracting data from the request body
+    const { cardId } = req.params;
+    // find Card
+    const card = await Card.findById(cardId);
+
+    if (!card) {
+      return res.status(404).json({
+        success: false,
+        message: "card not found",
+      });
+    }
+
+    // Delete the Card
+    await Card.findByIdAndDelete(cardId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Card deleted successfully",
+    });
+  } catch (error) {
+    //console.log(error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "something went wrong during deleting Card",
+    });
+  }
+};
