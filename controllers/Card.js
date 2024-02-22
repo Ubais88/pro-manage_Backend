@@ -1,4 +1,5 @@
 const Card = require("../models/Card");
+const moment = require("moment");
 
 // Controller function to create a new card
 exports.createCard = async (req, res) => {
@@ -74,6 +75,79 @@ exports.deleteCard = async (req, res) => {
       success: false,
       error: error.message,
       message: "something went wrong during deleting Card",
+    });
+  }
+};
+
+exports.getAllCards = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { sortingTime } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "UserId is required",
+      });
+    }
+
+    let startDate;
+    switch (sortingTime) {
+      case "today":
+        startDate = moment().startOf("day");
+        break;
+      case "week":
+        startDate = moment().subtract(7, "days").startOf("day");
+        break;
+      case "month":
+        startDate = moment().subtract(30, "days").startOf("day");
+        break;
+      default:
+        startDate = null;
+    }
+
+    if (!startDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid sorting time provided",
+      });
+    }
+
+    const cards = await Card.find({
+      creatorId: userId,
+      createdAt: { $gte: startDate.toDate() },
+    });
+
+    // Divide cards into categories
+    const categorizedCards = {
+      Backlog: [],
+      ToDo: [],
+      InProgress: [],
+      Done: [],
+    };
+
+    if (cards.length === 0) {
+      return res.status(200).json({
+        success: true,
+        cards: categorizedCards,
+        message: "No cards available",
+      });
+    }
+
+    cards.forEach((card) => {
+      categorizedCards[card.sectionType].push(card);
+    });
+
+    res.status(200).json({
+      success: true,
+      cards: categorizedCards,
+      message: "Cards fetched successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Something went wrong during fetching cards",
     });
   }
 };
