@@ -57,7 +57,6 @@ exports.signup = async (req, res) => {
   }
 };
 
-
 // Login controller for authenticating users
 exports.login = async (req, res) => {
   try {
@@ -92,7 +91,7 @@ exports.login = async (req, res) => {
           email: user.email,
           id: user._id.toString(),
         },
-        process.env.JWT_SECRET, 
+        process.env.JWT_SECRET,
         {
           expiresIn: "24h",
         }
@@ -119,3 +118,64 @@ exports.login = async (req, res) => {
     });
   }
 };
+
+
+exports.updateDetails = async (req, res) => {
+  try {
+    const { name, oldPassword, newPassword } = req.body;
+
+    // Fetch user details from the database
+    const userDetails = await User.findById(req.user.id);
+
+    // Check if both old and new passwords are provided together
+    if ((oldPassword && !newPassword) || (!oldPassword && newPassword)) {
+      return res.status(400).json({
+        success: false,
+        message: "Both password fields are required together",
+      });
+    }
+
+    // Update name if provided and different from current name
+    if (name && name !== userDetails.name) {
+      userDetails.name = name;
+    }
+
+    // Update password if both old and new passwords are provided
+    if (oldPassword && newPassword) {
+      if (oldPassword === newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "New Password cannot be the same as Old Password",
+        });
+      }
+      
+      // Validate old password
+      const isPasswordMatch = await bcrypt.compare(oldPassword, userDetails.password);
+      if (!isPasswordMatch) {
+        return res.status(401).json({ success: false, message: "The password is incorrect" });
+      }
+      
+      // Hash and update the new password
+      const encryptedPassword = await bcrypt.hash(newPassword, 10);
+      userDetails.password = encryptedPassword;
+    }
+
+    // Save the updated user details
+    const updatedUserDetails = await userDetails.save();
+
+    // Return success response
+    return res.status(200).json({
+      success: true,
+      updatedUserDetails,
+      message: "User details updated successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    // Return 500 Internal Server Error status code with error message
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+

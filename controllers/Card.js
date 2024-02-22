@@ -3,8 +3,17 @@ const Card = require("../models/Card");
 // Controller function to create a new card
 exports.createCard = async (req, res) => {
   try {
+    const userId = req.user.id;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "UserId is required are required",
+      });
+    }
+
     // Extracting data from the request body
     const { title, priority, checkList, dueDate, creatorId } = req.body;
+
     if (!title || !priority || !checkList.length) {
       return res.status(500).json({
         success: false,
@@ -18,7 +27,7 @@ exports.createCard = async (req, res) => {
       priority,
       checkList,
       dueDate,
-      creatorId,
+      creatorId: userId,
     });
 
     // Saving the new card to the database
