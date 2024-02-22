@@ -13,12 +13,13 @@ exports.createCard = async (req, res) => {
     }
 
     // Extracting data from the request body
-    const { title, priority, checkList, dueDate, creatorId } = req.body;
+    const { title, priority, checkList, dueDate } = req.body;
 
-    if (!title || !priority || !checkList.length) {
-      return res.status(500).json({
+    if (!title || !priority || !checkList || !checkList.length) {
+      return res.status(400).json({
         success: false,
-        message: "All Fields are required",
+        message:
+          "Title, priority, and at least one checklist item are required",
       });
     }
 
@@ -231,3 +232,54 @@ exports.getCardCounts = async (req, res) => {
   }
 };
 
+exports.updateCard = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    // Get user ID from request object
+    const { cardId } = req.params;
+
+    const card = await Card.findOne({ _id: cardId, creatorId: userId });
+
+    if (!card) {
+      return res.status(404).json({
+        success: false,
+        message: "Card not found",
+      });
+    }
+
+    // Extracting data from the request body
+    const { title, priority, checkList, dueDate } = req.body;
+
+    if (!title || !priority || !checkList || !checkList.length) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Title, priority, and at least one checklist item are required",
+      });
+    }
+
+    // Update the card
+    const updatedCard = await Card.findByIdAndUpdate(
+      cardId,
+      { title, priority, checkList, dueDate },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      updatedCard,
+      message: "Card updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Something went wrong while updating card",
+    });
+  }
+};
+
+exports.moveCard = async (req, res) => {
+  try {
+  } catch (error) {}
+};
