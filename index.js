@@ -8,11 +8,14 @@ app.use(express.json());
 
 
 const database = require("./config/database");
+const userRoutes = require("./routes/User");
+
 
 const PORT = process.env.PORT || 4000;
 database.dbconnect();
 
-
+// routes
+app.use("/api/v1/auth", userRoutes);
 
 
 
