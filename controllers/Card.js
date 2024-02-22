@@ -103,15 +103,11 @@ exports.getAllCards = async (req, res) => {
         startDate = moment().subtract(30, "days").startOf("day");
         break;
       default:
-        startDate = null;
+        startDate = moment().subtract(7, "days").startOf("day");
     }
 
-    if (!startDate) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid sorting time provided",
-      });
-    }
+    console.log("startDate.toDate() ", startDate.toDate());
+    console.log("startDate ", startDate);
 
     const cards = await Card.find({
       creatorId: userId,
@@ -148,6 +144,34 @@ exports.getAllCards = async (req, res) => {
       success: false,
       error: error.message,
       message: "Something went wrong during fetching cards",
+    });
+  }
+};
+
+exports.getCard = async (req, res) => {
+  try {
+    const { cardId } = req.params;
+
+    const card = await Card.findById(cardId);
+
+    if (!card) {
+      return res.status(400).json({
+        success: false,
+        message: "card is missing or cardId is wrong",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      card,
+      message: "card fetched successfully",
+    });
+  } catch (error) {
+    //console.log(error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "something went wrong during fetching card",
     });
   }
 };
