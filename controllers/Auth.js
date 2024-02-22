@@ -1,22 +1,23 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 // Signup Controller for Registering USers
 exports.signup = async (req, res) => {
   try {
     // Destructure fields from the request body
-    const { name, email, password, cPassword } = req.body;
+    const { name, email, password, confirmPassword } = req.body;
 
     // Check if All Details are there or not
-    if (!name || !email || !password || !cPassword) {
+    if (!name || !email || !password || !confirmPassword) {
       return res.status(403).send({
         success: false,
         message: "All Fields are required",
       });
     }
     // Check if password and confirm password match
-    if (password !== cPassword) {
+    if (password !== confirmPassword) {
       return res.status(400).json({
         success: false,
         message:
@@ -91,7 +92,7 @@ exports.login = async (req, res) => {
           email: user.email,
           id: user._id.toString(),
         },
-        process.env.JWT_SECRET,
+        process.env.JWT_SECRET, 
         {
           expiresIn: "24h",
         }
