@@ -6,10 +6,15 @@ dotenv.config();
 
 app.use(express.json());
 
+
 const database = require("./config/database");
 
 const PORT = process.env.PORT || 4000;
 database.dbconnect();
+
+
+
+
 
 app.listen(PORT, () => {
   console.log("App listening on port", PORT);
