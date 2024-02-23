@@ -107,9 +107,6 @@ exports.getAllCards = async (req, res) => {
         startDate = moment().subtract(7, "days").startOf("day");
     }
 
-    console.log("startDate.toDate() ", startDate.toDate());
-    console.log("startDate ", startDate);
-
     const cards = await Card.find({
       creatorId: userId,
       createdAt: { $gte: startDate.toDate() },
@@ -281,5 +278,97 @@ exports.updateCard = async (req, res) => {
 
 exports.moveCard = async (req, res) => {
   try {
-  } catch (error) {}
+    const userId = req.user.id;
+    const { cardId } = req.params;
+    const { targetSection } = req.body;
+
+    if (
+      !targetSection ||
+      !["Backlog", "ToDo", "Inprogress", "Done"].includes(targetSection)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid target section",
+      });
+    }
+
+    const card = await Card.findOne({ _id: cardId, creatorId: userId });
+    if (!card) {
+      return res.status(404).json({
+        success: false,
+        message: "Card not found or you are not authorized to move this card",
+      });
+    }
+
+    // Update the sectionType of the card
+    card.sectionType = targetSection;
+    await card.save();
+
+    res.status(200).json({
+      success: true,
+      updatedCard: card,
+      message: "Card moved successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Something went wrong while moving the card",
+    });
+  }
+};
+
+exports.toggleChecklistItem = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { cardId, itemId } = req.params;
+    const { isChecked } = req.body;
+
+    if (!isChecked) {
+      return res.status(404).json({
+        success: false,
+        message: "Check Status is required",
+      });
+    }
+    const card = await Card.findOne({ _id: cardId, creatorId: userId }).select(
+      "checkList"
+    );
+    // console.log("card: ", card);
+    if (!card) {
+      return res.status(404).json({
+        success: false,
+        message: "Card not found or you are not authorized to update this card",
+      });
+    }
+
+    // Find the checklist item
+    const checklistItem = card.checkList.find(
+      (item) => item._id.toString() === itemId
+    );
+    if (!checklistItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Checklist item not found",
+      });
+    }
+
+    // Toggle the isChecked status
+    checklistItem.isChecked = isChecked;
+
+    // Save the updated card
+    await card.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Checklist item status toggled successfully",
+      updatedCard: card,
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Something went wrong while toggling the checklist item status",
+    });
+  }
 };
