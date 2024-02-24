@@ -1,5 +1,6 @@
 const Card = require("../models/Card");
 const moment = require("moment");
+const { formatDateWithColor } = require('../utils/formatDateWithColor')
 
 // Controller function to create a new card
 exports.createCard = async (req, res) => {
@@ -111,7 +112,7 @@ exports.getAllCards = async (req, res) => {
       creatorId: userId,
       createdAt: { $gte: startDate.toDate() },
     });
-
+    console.log("cards : " , cards)
     // Divide cards into categories
     const categorizedCards = {
       Backlog: [],
@@ -128,9 +129,19 @@ exports.getAllCards = async (req, res) => {
       });
     }
 
+    // Format dates and apply color indicators
     cards.forEach((card) => {
+      if (card.dueDate) {
+        const formattedDateWithColor = formatDateWithColor(card.dueDate);
+        card.formattedCreatedAt = {
+          formattedDate: formattedDateWithColor.formattedDate,
+          color: formattedDateWithColor.color,
+        };
+      }
       categorizedCards[card.sectionType].push(card);
     });
+
+    // console.log("categorized cards : ", categorizedCards);
 
     res.status(200).json({
       success: true,
@@ -281,7 +292,7 @@ exports.moveCard = async (req, res) => {
     const userId = req.user.id;
     const { cardId } = req.params;
     const { targetSection } = req.body;
-
+    console.log("target section: ", targetSection);
     if (
       !targetSection ||
       !["Backlog", "ToDo", "Inprogress", "Done"].includes(targetSection)

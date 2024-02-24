@@ -20,11 +20,15 @@ const cardSchema = new mongoose.Schema(
     priority: {
       type: String,
       enum: ["HIGH PRIORITY", "MODERATE PRIORITY", "LOW PRIORITY"],
-      required: true, 
+      required: true,
     },
     checkList: {
       type: [checklistSchema],
       required: true,
+    },
+    formattedCreatedAt: {
+      formattedDate: String,
+      color: String
     },
     dueDate: {
       type: Date,

@@ -23,8 +23,11 @@ router.get("/getcard/:cardId", getCard);
 router.get("/analysis", authMiddleware, getCardCounts);
 router.put("/update/:cardId", authMiddleware, updateCard);
 router.put("/movecard/:cardId", authMiddleware, moveCard);
-router.put('/toggle/:cardId/checklist/:itemId', authMiddleware , toggleChecklistItem);
-
+router.put(
+  "/toggle/:cardId/checklist/:itemId",
+  authMiddleware,
+  toggleChecklistItem
+);
 
 // Export the router for use in the main application
 module.exports = router;

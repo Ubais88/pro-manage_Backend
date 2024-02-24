@@ -11,7 +11,7 @@ router.post("/signup", signup);
 // Route for user login
 router.post("/login", login);
 // update user data
-router.put("/update",authMiddleware , updateDetails);
+router.put("/update", authMiddleware , updateDetails);
 
 // Export the router for use in the main application
 module.exports = router;
