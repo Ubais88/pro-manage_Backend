@@ -1,6 +1,6 @@
 const Card = require("../models/Card");
 const moment = require("moment");
-const { formatDateWithColor } = require('../utils/formatDateWithColor')
+const { formatDateWithColor } = require("../utils/formatDateWithColor");
 
 // Controller function to create a new card
 exports.createCard = async (req, res) => {
@@ -112,12 +112,12 @@ exports.getAllCards = async (req, res) => {
       creatorId: userId,
       createdAt: { $gte: startDate.toDate() },
     });
-    console.log("cards : " , cards)
+    // console.log("cards : " , cards)
     // Divide cards into categories
     const categorizedCards = {
       Backlog: [],
       ToDo: [],
-      InProgress: [],
+      Inprogress: [],
       Done: [],
     };
 
