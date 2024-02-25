@@ -169,10 +169,20 @@ exports.getCard = async (req, res) => {
         message: "card is missing or cardId is wrong",
       });
     }
-
+    if (card.dueDate) {
+      const formattedDateWithColor = formatDateWithColor(card.dueDate);
+      card.formattedCreatedAt = {
+        formattedDate: formattedDateWithColor.formattedDate,
+        color: formattedDateWithColor.color,
+      };
+    }
+    const totalChecked =
+      card?.checkList.filter((item) => item.isChecked).length || 0;
+      
     res.status(200).json({
       success: true,
       card,
+      totalChecked,
       message: "card fetched successfully",
     });
   } catch (error) {

@@ -17,7 +17,7 @@ const { authMiddleware } = require("../middlewares/authMiddleware");
 
 // Route for user createQuiz
 router.post("/create", authMiddleware, createCard);
-router.delete("/delete", authMiddleware, deleteCard);
+router.delete("/delete/:cardId", authMiddleware, deleteCard);
 router.get("/getallcards", authMiddleware, getAllCards);
 router.get("/getcard/:cardId", getCard);
 router.get("/analysis", authMiddleware, getCardCounts);
