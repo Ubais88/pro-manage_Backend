@@ -85,7 +85,6 @@ exports.getAllCards = async (req, res) => {
   try {
     const userId = req.user.id;
     const { sortingTime } = req.body;
-    console.log("sortings: ", sortingTime)
     if (!userId) {
       return res.status(400).json({
         success: false,
