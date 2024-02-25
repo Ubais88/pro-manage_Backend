@@ -85,7 +85,7 @@ exports.getAllCards = async (req, res) => {
   try {
     const userId = req.user.id;
     const { sortingTime } = req.body;
-
+    console.log("sortings: ", sortingTime)
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -95,13 +95,13 @@ exports.getAllCards = async (req, res) => {
 
     let startDate;
     switch (sortingTime) {
-      case "today":
+      case "Today":
         startDate = moment().startOf("day");
         break;
-      case "week":
+      case "This Week":
         startDate = moment().subtract(7, "days").startOf("day");
         break;
-      case "month":
+      case "This Month":
         startDate = moment().subtract(30, "days").startOf("day");
         break;
       default:
