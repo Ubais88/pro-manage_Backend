@@ -123,7 +123,6 @@ exports.login = async (req, res) => {
 exports.updateDetails = async (req, res) => {
   try {
     const { name, oldPassword, newPassword } = req.body;
-
     // Fetch user details from the database
     const userDetails = await User.findById(req.user.id);
 

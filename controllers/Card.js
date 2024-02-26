@@ -177,7 +177,7 @@ exports.getCard = async (req, res) => {
     }
     const totalChecked =
       card?.checkList.filter((item) => item.isChecked).length || 0;
-      
+
     res.status(200).json({
       success: true,
       card,
@@ -301,7 +301,7 @@ exports.moveCard = async (req, res) => {
     const userId = req.user.id;
     const { cardId } = req.params;
     const { targetSection } = req.body;
-    console.log("target section: ", targetSection);
+    // console.log("target section: ", targetSection);
     if (
       !targetSection ||
       !["Backlog", "ToDo", "Inprogress", "Done"].includes(targetSection)
@@ -343,8 +343,8 @@ exports.toggleChecklistItem = async (req, res) => {
     const userId = req.user.id;
     const { cardId, itemId } = req.params;
     const { isChecked } = req.body;
-
-    if (!isChecked) {
+    // console.log("isChecked: " + isChecked);
+    if (isChecked !== true && isChecked !== false) {
       return res.status(404).json({
         success: false,
         message: "Check Status is required",
@@ -365,6 +365,7 @@ exports.toggleChecklistItem = async (req, res) => {
     const checklistItem = card.checkList.find(
       (item) => item._id.toString() === itemId
     );
+
     if (!checklistItem) {
       return res.status(404).json({
         success: false,
