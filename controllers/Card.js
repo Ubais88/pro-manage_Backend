@@ -110,7 +110,7 @@ exports.getAllCards = async (req, res) => {
     const cards = await Card.find({
       creatorId: userId,
       createdAt: { $gte: startDate.toDate() },
-    });
+    }).sort({ updatedAt: 1 });
     // console.log("cards : " , cards)
     // Divide cards into categories
     const categorizedCards = {
