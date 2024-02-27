@@ -35,7 +35,7 @@ const cardSchema = new mongoose.Schema(
     },
     sectionType: {
       type: String,
-      enum: ["Backlog", "ToDo", "Inprogress", "Done"],
+      enum: ["Backlog", "ToDo", "InProgress", "Done"],
       default: "ToDo",
     },
     creatorId: {

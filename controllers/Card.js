@@ -116,7 +116,7 @@ exports.getAllCards = async (req, res) => {
     const categorizedCards = {
       Backlog: [],
       ToDo: [],
-      Inprogress: [],
+      InProgress: [],
       Done: [],
     };
 
@@ -304,7 +304,7 @@ exports.moveCard = async (req, res) => {
     // console.log("target section: ", targetSection);
     if (
       !targetSection ||
-      !["Backlog", "ToDo", "Inprogress", "Done"].includes(targetSection)
+      !["Backlog", "ToDo", "InProgress", "Done"].includes(targetSection)
     ) {
       return res.status(400).json({
         success: false,
