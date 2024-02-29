@@ -31,9 +31,11 @@ exports.createCard = async (req, res) => {
       checkList,
       dueDate,
       creatorId: userId,
-    });
+    },{ timestamps: true });
+
     // Saving the new card to the database
     const savedCard = await newCard.save();
+    
     res.status(201).json({
       success: true,
       savedCard,
@@ -109,8 +111,7 @@ exports.getAllCards = async (req, res) => {
     const cards = await Card.find({
       creatorId: userId,
       createdAt: { $gte: startDate.toDate() },
-    });
-    // .sort({ updatedAt: 1 });
+    }).sort({ updatedAt: 1 });
 
     const categorizedCards = {
       Backlog: [],
@@ -278,7 +279,7 @@ exports.updateCard = async (req, res) => {
     const updatedCard = await Card.findByIdAndUpdate(
       cardId,
       { title, priority, checkList, dueDate },
-      { new: true }
+      { new: true, timestamps: false }
     );
 
     res.status(200).json({
@@ -343,53 +344,38 @@ exports.toggleChecklistItem = async (req, res) => {
     const userId = req.user.id;
     const { cardId, itemId } = req.params;
     const { isChecked } = req.body;
-    // console.log("isChecked: " + isChecked);
+
     if (isChecked !== true && isChecked !== false) {
-      return res.status(404).json({
+      return res.status(400).json({
         success: false,
         message: "Check Status is required",
       });
     }
-    const card = await Card.findOne({ _id: cardId, creatorId: userId }).select(
-      "checkList"
+
+    const updatedCard = await Card.findByIdAndUpdate(
+      { _id: cardId, creatorId: userId },
+      { $set: { "checkList.$[elemId].isChecked": isChecked } },
+      { new: true, timestamps: false, arrayFilters: [{ "elemId._id": itemId }] }
     );
-    // console.log("card: ", card);
-    if (!card) {
+
+    if (!updatedCard) {
       return res.status(404).json({
         success: false,
         message: "Card not found or you are not authorized to update this card",
       });
     }
 
-    // Find the checklist item
-    const checklistItem = card.checkList.find(
-      (item) => item._id.toString() === itemId
-    );
-
-    if (!checklistItem) {
-      return res.status(404).json({
-        success: false,
-        message: "Checklist item not found",
-      });
-    }
-
-    // Toggle the isChecked status
-    checklistItem.isChecked = isChecked;
-
-    // Save the updated card
-    await card.save();
-
     res.status(200).json({
       success: true,
       message: "Checklist item status toggled successfully",
-      updatedCard: card,
+      updatedCard,
     });
   } catch (error) {
-    console.log("error", error);
+    console.error("Error toggling checklist item:", error);
     res.status(500).json({
       success: false,
-      error: error.message,
       message: "Something went wrong while toggling the checklist item status",
+      error: error.message,
     });
   }
 };
