@@ -32,7 +32,6 @@ exports.createCard = async (req, res) => {
       dueDate,
       creatorId: userId,
     });
-
     // Saving the new card to the database
     const savedCard = await newCard.save();
     res.status(201).json({
@@ -85,7 +84,6 @@ exports.getAllCards = async (req, res) => {
   try {
     const userId = req.user.id;
     const { sortingTime } = req.body;
-    console.log("Sorting Time: ", sortingTime);
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -111,7 +109,8 @@ exports.getAllCards = async (req, res) => {
     const cards = await Card.find({
       creatorId: userId,
       createdAt: { $gte: startDate.toDate() },
-    }).sort({ updatedAt: 1 });
+    });
+    // .sort({ updatedAt: 1 });
 
     const categorizedCards = {
       Backlog: [],
@@ -301,7 +300,6 @@ exports.moveCard = async (req, res) => {
     const userId = req.user.id;
     const { cardId } = req.params;
     const { targetSection } = req.body;
-    // console.log("target section: ", targetSection);
     if (
       !targetSection ||
       !["Backlog", "ToDo", "InProgress", "Done"].includes(targetSection)
@@ -323,6 +321,7 @@ exports.moveCard = async (req, res) => {
 
     // Update the sectionType of the card
     card.sectionType = targetSection;
+    card.updatedAt = new Date();
     await card.save();
 
     res.status(200).json({
