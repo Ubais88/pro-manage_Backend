@@ -28,7 +28,7 @@ const cardSchema = new mongoose.Schema(
     },
     formattedCreatedAt: {
       formattedDate: String,
-      color: String
+      color: String,
     },
     dueDate: {
       type: Date,

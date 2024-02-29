@@ -85,6 +85,7 @@ exports.getAllCards = async (req, res) => {
   try {
     const userId = req.user.id;
     const { sortingTime } = req.body;
+    console.log("Sorting Time: ", sortingTime);
     if (!userId) {
       return res.status(400).json({
         success: false,
@@ -111,8 +112,7 @@ exports.getAllCards = async (req, res) => {
       creatorId: userId,
       createdAt: { $gte: startDate.toDate() },
     }).sort({ updatedAt: 1 });
-    // console.log("cards : " , cards)
-    // Divide cards into categories
+
     const categorizedCards = {
       Backlog: [],
       ToDo: [],
@@ -313,6 +313,7 @@ exports.moveCard = async (req, res) => {
     }
 
     const card = await Card.findOne({ _id: cardId, creatorId: userId });
+
     if (!card) {
       return res.status(404).json({
         success: false,
