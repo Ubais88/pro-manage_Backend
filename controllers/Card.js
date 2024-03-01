@@ -31,11 +31,11 @@ exports.createCard = async (req, res) => {
       checkList,
       dueDate,
       creatorId: userId,
-    },{ timestamps: true });
+    });
 
     // Saving the new card to the database
     const savedCard = await newCard.save();
-    
+
     res.status(201).json({
       success: true,
       savedCard,
@@ -73,7 +73,6 @@ exports.deleteCard = async (req, res) => {
       message: "Card deleted successfully",
     });
   } catch (error) {
-    //console.log(error);
     res.status(500).json({
       success: false,
       error: error.message,
@@ -140,8 +139,6 @@ exports.getAllCards = async (req, res) => {
       categorizedCards[card.sectionType].push(card);
     });
 
-    // console.log("categorized cards : ", categorizedCards);
-
     res.status(200).json({
       success: true,
       cards: categorizedCards,
@@ -185,7 +182,6 @@ exports.getCard = async (req, res) => {
       message: "card fetched successfully",
     });
   } catch (error) {
-    //console.log(error);
     res.status(500).json({
       success: false,
       error: error.message,
