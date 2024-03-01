@@ -16,6 +16,15 @@ exports.signup = async (req, res) => {
         message: "All Fields are required",
       });
     }
+
+    // Check if password meets minimum length requirement
+    if (password.length < 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 5 characters long.",
+      });
+    }
+    
     // Check if password and confirm password match
     if (password !== confirmPassword) {
       return res.status(400).json({

@@ -22,6 +22,13 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      validate: {
+        validator: function (value) {
+          // Minimum password length validation
+          return value.length >= 5;
+        },
+        message: "Password must be at least 5 characters long",
+      },
     },
   },
   { timestamps: true }
