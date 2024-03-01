@@ -24,7 +24,7 @@ exports.signup = async (req, res) => {
         message: "Password must be at least 5 characters long.",
       });
     }
-    
+
     // Check if password and confirm password match
     if (password !== confirmPassword) {
       return res.status(400).json({
@@ -109,7 +109,7 @@ exports.login = async (req, res) => {
       res.status(200).json({
         success: true,
         token,
-        name:user.name,
+        name: user.name,
         message: `User Login Success`,
       });
     } else {
@@ -128,7 +128,6 @@ exports.login = async (req, res) => {
   }
 };
 
-
 exports.updateDetails = async (req, res) => {
   try {
     const { name, oldPassword, newPassword } = req.body;
@@ -143,12 +142,10 @@ exports.updateDetails = async (req, res) => {
       });
     }
 
-    // Update name if provided and different from current name
     if (name && name !== userDetails.name) {
       userDetails.name = name;
     }
 
-    // Update password if both old and new passwords are provided
     if (oldPassword && newPassword) {
       if (oldPassword === newPassword) {
         return res.status(400).json({
@@ -156,22 +153,30 @@ exports.updateDetails = async (req, res) => {
           message: "New Password cannot be the same as Old Password",
         });
       }
-      
-      // Validate old password
-      const isPasswordMatch = await bcrypt.compare(oldPassword, userDetails.password);
+
+      const isPasswordMatch = await bcrypt.compare(
+        oldPassword,
+        userDetails.password
+      );
       if (!isPasswordMatch) {
-        return res.status(401).json({ success: false, message: "The password is incorrect" });
+        return res
+          .status(401)
+          .json({ success: false, message: "The password is incorrect" });
       }
-      
-      // Hash and update the new password
+
+      if (newPassword.length < 5) {
+        return res.status(400).json({
+          success: false,
+          message: "New password must be at least 5 characters long",
+        });
+      }
+
       const encryptedPassword = await bcrypt.hash(newPassword, 10);
       userDetails.password = encryptedPassword;
     }
 
-    // Save the updated user details
     const updatedUserDetails = await userDetails.save();
 
-    // Return success response
     return res.status(200).json({
       success: true,
       updatedUserDetails,
@@ -179,11 +184,9 @@ exports.updateDetails = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    // Return 500 Internal Server Error status code with error message
     return res.status(500).json({
       success: false,
       message: "Something went wrong",
     });
   }
 };
-
